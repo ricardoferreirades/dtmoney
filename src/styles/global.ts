@@ -4,6 +4,7 @@ export const GlobalStyle = createGlobalStyle`
 :root {
     --background: #f0f2f5;
     --red: #e5224d;
+    --green: #33CC95;
     --blue: #5429cc;
     --blue-light: #6933ff;
     --text-title: #363f5f;
@@ -48,4 +49,4 @@ button {
     opacity: 0.6;
     cursor: not-allowed;
 }
-`
+`;
