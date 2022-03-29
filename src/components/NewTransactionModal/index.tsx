@@ -3,8 +3,11 @@ import { Container, RadioBox, TransactionTypeContainer } from "./styles";
 import closeImg from ".././../assets/close.svg";
 import incomeImage from "../../assets/income.svg";
 import outcomeImage from "../../assets/outcome.svg";
-import { FormEvent, useState } from "react";
-import { api } from "../../services/api";
+import { FormEvent, useContext, useState } from "react";
+import {
+  TransactionsConstext,
+  TransactionType,
+} from "../../TransactionsContext";
 interface NewTransactionModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
@@ -14,21 +17,21 @@ export function NewTransactionModal({
   isOpen,
   onRequestClose,
 }: NewTransactionModalProps) {
-  const [type, setType] = useState("deposit");
+  const { createTransaction } = useContext(TransactionsConstext);
+  const [type, setType] = useState<TransactionType>("deposit");
   const [title, setTitle] = useState("");
-  const [value, setValue] = useState(0);
+  const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("");
 
   function handleCreateNewTransaction(event: FormEvent) {
     event.preventDefault();
-    const data = {
+
+    createTransaction({
       type,
       title,
-      value,
+      amount,
       category,
-    };
-
-    api.post("transactions", data);
+    });
   }
 
   return (
@@ -38,7 +41,11 @@ export function NewTransactionModal({
       overlayClassName="react-modal-overlay"
       className="react-modal-content"
     >
-      <button type="button" className="react-modal-close">
+      <button
+        type="button"
+        className="react-modal-close"
+        onClick={onRequestClose}
+      >
         <img src={closeImg} alt="close modal icon" />
       </button>
 
@@ -55,8 +62,8 @@ export function NewTransactionModal({
           type="number"
           placeholder="Value"
           min={0}
-          value={value}
-          onChange={(event) => setValue(Number(event.target.value))}
+          value={amount}
+          onChange={(event) => setAmount(Number(event.target.value))}
         />
 
         <TransactionTypeContainer>
