@@ -1,10 +1,41 @@
+import { access } from "fs";
+import { useContext } from "react";
 import incomeImg from "../../assets/income.svg";
 import outcomeImg from "../../assets/outcome.svg";
 import totalImg from "../../assets/total.svg";
+import { TransactionsConstext } from "../../TransactionsContext";
 
 import { Container } from "./styles";
 
 export function Summary() {
+  const { transactions } = useContext(TransactionsConstext);
+
+  const summary = transactions.reduce(
+    (acc, transaction) => {
+      if (transaction.type === "deposit") {
+        acc.deposit += transaction.amount;
+        acc.total += transaction.amount;
+      } else {
+        acc.withdraw -= transaction.amount;
+        acc.total -= transaction.amount;
+      }
+
+      return acc;
+    },
+    {
+      deposit: 0,
+      withdraw: 0,
+      total: 0,
+    }
+  );
+
+  function toBRLCurrency(amount: number): string {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(amount);
+  }
+
   return (
     <Container>
       <div>
@@ -12,21 +43,21 @@ export function Summary() {
           <p>Entradas</p>
           <img src={incomeImg} alt="entries" />
         </header>
-        <strong>R$ 1000,00</strong>
+        <strong>{toBRLCurrency(summary.deposit)}</strong>
       </div>
       <div>
         <header>
           <p>Outcome</p>
-          <img src={incomeImg} alt="outcoming" />
+          <img src={outcomeImg} alt="outcoming" />
         </header>
-        <strong>- R$ 1000,00</strong>
+        <strong>- {toBRLCurrency(summary.withdraw * -1)}</strong>
       </div>
       <div className="highlighted-background">
         <header>
           <p>Total</p>
           <img src={totalImg} alt="total" />
         </header>
-        <strong>R$ 1000,00</strong>
+        <strong>{toBRLCurrency(summary.total)}</strong>
       </div>
     </Container>
   );
